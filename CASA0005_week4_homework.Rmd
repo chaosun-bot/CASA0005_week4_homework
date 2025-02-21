@@ -7,9 +7,60 @@ date: "2024-10-21"
 
 # week4_homework
 
-## Library
+## Load necessary packages
+Loads necessary libraries for data reading, spatial analysis, data manipulation, and visualization.
 ```{r setup, include=FALSE}
-
-
+library(readr)
+library(sf)
+library(here)
+library(countrycode)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
 ```
 
+## Reading Data
+Loads datasets containing composite indices and world country boundaries, then retrieves their column names.
+```{r}
+# Load data
+HDR_Composite_Data <- read.csv(here("week4_homework_data", "HDR23-24_Composite_indices_complete_time_series.csv"))
+World_Map <- st_read(here("week4_homework_data", "World_Countries_(Generalized).geojson"))
+
+# Check column names
+colnames(HDR_Composite_Data)
+colnames(World_Map)
+```
+
+## Prepare and merge data
+Calculates the change in Gender Inequality Index (GII) between 2010 and 2019 and merges it with a world countries dataset by converting country codes.
+```{r}
+# Extract Gender Inequality Index (GII) data and calculate the difference between 2010 and 2019
+gender_inequality_index <- HDR_Composite_Data %>%
+  select(iso3, contains("gii")) %>%
+  mutate(gii_change_2019_2010 = gii_2019 - gii_2010)
+
+# Process geographic data and merge it with gender inequality data
+World_Map_Modified <- World_Map %>%
+  mutate(ISO3_Code = countrycode(ISO, "iso2c", "iso3c")) %>%
+  left_join(gender_inequality_index, by = c("ISO3_Code" = "iso3"))
+```
+
+## Plot a map
+Visualizes the difference in Gender Inequality Index (GII) between 2010 and 2019 across countries.
+```{r}
+# Visualize the difference in the Gender Inequality Index
+ggplot(World_Map_Modified) + 
+  geom_sf(aes(fill = gii_change_2019_2010), 
+          color = "#A9A9A9", 
+          size = 0.1) + 
+  scale_fill_gradient2(
+    low = "#FDB927", 
+    mid = "#FFFFFF", 
+    high = "#552583", 
+    midpoint = 0, 
+    na.value = "#D3D3D3", 
+    name = "GII Difference") + 
+  theme_minimal() + 
+  labs(title = "Global Gender Inequality Index Difference 2010-2019") + 
+  theme(plot.title = element_text(hjust = 0.5))
+```
