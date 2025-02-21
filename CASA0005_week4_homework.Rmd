@@ -1,14 +1,16 @@
 ---
 title: "CASA0005_week4_homework"
 author: "Chao Sun"
-output: html_document
+output: md_document
 date: "2024-10-21"
 ---
 
 # week4_homework
 
 ## Load necessary packages
+
 Loads necessary libraries for data reading, spatial analysis, data manipulation, and visualization.
+
 ```{r setup, include=FALSE}
 library(readr)
 library(sf)
@@ -20,7 +22,9 @@ library(ggplot2)
 ```
 
 ## Reading Data
+
 Loads datasets containing composite indices and world country boundaries, then retrieves their column names.
+
 ```{r}
 # Load data
 HDR_Composite_Data <- read.csv(here("week4_homework_data", "HDR23-24_Composite_indices_complete_time_series.csv"))
@@ -32,7 +36,9 @@ colnames(World_Map)
 ```
 
 ## Prepare and merge data
+
 Calculates the change in Gender Inequality Index (GII) between 2010 and 2019 and merges it with a world countries dataset by converting country codes.
+
 ```{r}
 # Extract Gender Inequality Index (GII) data and calculate the difference between 2010 and 2019
 gender_inequality_index <- HDR_Composite_Data %>%
@@ -46,7 +52,9 @@ World_Map_Modified <- World_Map %>%
 ```
 
 ## Plot a map
+
 Visualizes the difference in Gender Inequality Index (GII) between 2010 and 2019 across countries.
+
 ```{r}
 # Visualize the difference in the Gender Inequality Index
 ggplot(World_Map_Modified) + 
